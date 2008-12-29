@@ -1,0 +1,13 @@
+r600_demo
+convert_shader
+*.o
+*.lo
+*.la
+.deps
+.libs
+*~
+*.bak
+*.swp
+R6xx_3D.txt
+R6xx_3D.pdf
+TAGS

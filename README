@@ -1,0 +1,117 @@
+This source code  may damage your hardware.
+It is *UNTESTED* and *BROKEN* !
+Or, at least, some of it is.
+
+
+
+R600_DEMO
+
+	DRM/DRI exercise utility
+
+	This is a bringup utility for learning how to program r6xx cards. It
+	has no value for you if you are not a hardware driver hacker. Except
+	for that it (hopefully) will draw a single triangle for you :-P
+
+	Authors:
+		Matthias Hopf <mhopf@suse.de>
+		Alexander Deucher <Alexander.Deucher@amd.com>
+
+	The original skeleton for r600_demo was r300_demo, but there's almost
+	none (literally) code left from these days.
+
+	The r600_demo code is provided without any warranty and in
+	understanding that direct access to the hardware can lead to permanent
+	damage to the hardware (or even damage to the user - say from locked up
+	laser displays).
+	The software is meant for experimentation and thus one should not
+	expect it to be checked for compatibility or suitability for any
+	purpose.
+
+
+STATE
+
+	- DRM state dump                                                     ok
+	  DRM setup works - DRM shows some issues, still, GART
+	  texture space has a wrong GPU address assigned, etc.
+	- GPU state dump                                                     ok
+	- CP setup + test                                        '.'         ok
+	- CPU based clear screen                                 'c'         ok
+	- More extensive CP tests                                'p'         ok
+	- PM4 dump tests                                         'w' 'W' 'b' ok
+	- Triangle tests                                         't' 'T'     ok
+	- Texturing tests                                        'q'         ok
+	- GPU reset                                              'r'         ok
+	- EXA tests                                              'e' 'E'     ok
+	- Register dump                                          <range>     ok
+	- Register setting                                       <reg>=<val> ok
+	- Various test                                           'x'         unknown
+
+	Tested on R600, RV610, RV620, RV630, RV635, RV670, RV710, RV730, RV770
+
+
+SETUP:
+
+	Requirements:
+
+	- r600_demo from git://anongit.freedesktop.org/git/mesa/r600_demo
+
+	- An r6xx or r7xx card, testing happens mostly on
+	  RV610, RV670, and RV770. R600 is probably the least supported.
+
+	- Install + configure radeonhd:
+	  Get the latest driver (1.2.4 is good enough). Explicitly enable
+	  DRI and disable 2D acceleration:
+
+	  Option "DRI"
+	  Option "AccelMethod" "none"
+
+	- Install DRM:
+	  Get and install the latest DRM.
+
+
+RUNNING:
+
+	- Run the Xserver. No additional clients needed (r600_demo is not an X
+	  client, so no server reset occurs).
+	- Call r600_demo on the same machine as root(!).
+
+	./r600_demo
+
+	  This will print out the usage, including all options.
+
+	./r600_demo ""
+
+	  This will print out the state of DRM and the graphics card
+	  (busy flags + ring and buffer states). Add '-v' to get a list of all
+	  mapped memory regions and a more verbose state output.
+
+	./r600_demo pc
+
+	  Will test the CP, and clear the screen.
+
+	./r600_demo t
+
+	  Draws two Gouraud shaded triangles.
+
+	./r600_demo r
+
+	  This resets the engine. "./r600_demo rct" is a typical call, because
+	  the 't' and 'q' tests do not invaldiate the shaders correctly yet.
+
+	./r600_demo rcqE
+
+	  Draws a textured quad, and then invokes the EXA copy test, which
+	  copies the top left corner 3 times.
+
+	./r600_demo "" 30000-3001c
+
+	  Register dump: prints out the first two ALU constants
+	  (SQ_ALU_CONSTANT0_0 - SQ_ALU_CONSTANT3_1). Any number of single
+	  registers and ranges allowed.
+	  You can lock up the whole machine when accessing non-existent
+	  register space, so beware.
+
+	make dump
+
+	  Create a register dump of known registers.
+
