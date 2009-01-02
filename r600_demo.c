@@ -397,7 +397,7 @@ void read_registers(void)
 	adapter.chipset = CHIPSET_RV620;
 	break;
     case 0x9440:    case 0x9442:    case 0x9444:    case 0x9446:
-    case 0x944E:    case 0x9456:
+    case 0x944C:    case 0x944E:    case 0x9456:
 	adapter.chipset = CHIPSET_RV770;
 	break;
     case 0x9540:    case 0x9541:    case 0x9592:    case 0x954E:
