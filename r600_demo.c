@@ -396,6 +396,10 @@ void read_registers(void)
     case 0x95CD:    case 0x95CE:    case 0x95CF:
 	adapter.chipset = CHIPSET_RV620;
 	break;
+    case 0x9610:    case 0x9611:    case 0x9612:    case 0x9613:
+    case 0x9614:
+	adapter.chipset = CHIPSET_RS780;
+	break;
     case 0x9440:    case 0x9442:    case 0x9444:    case 0x9446:
     case 0x944C:    case 0x944E:    case 0x9456:
 	adapter.chipset = CHIPSET_RV770;
@@ -437,6 +441,9 @@ void read_registers(void)
 	break;
     case CHIPSET_RV670:
 	fprintf (stderr, "Chipset: RV670\n\n");
+	break;
+    case CHIPSET_RS780:
+	fprintf (stderr, "Chipset: RS780\n\n");
 	break;
     case CHIPSET_RV770:
 	fprintf (stderr, "Chipset: RV770\n\n");
