@@ -73,10 +73,17 @@ void test_packets (adapter_t *adapt)
 void simple_clear (adapter_t* adapt)
 {
     uint32_t *dst = adapt->display;
-    uint32_t len = adapt->display_pitch * adapt->display_height;
-    int i;
+    int i, j;
+    uint32_t col = 0x00008000;
 
-    for (i = len; i; --i)
-	*dst++ = 0x00008000;
+    for (i = 0; i < adapt->display_height; i++) {
+	for (j = 0; j < adapt->display_pitch; j++) {
+	    *dst++ = col;
+	    if (j % 32 == 31)
+		col ^= 0x00008080;
+	}
+	if (i % 32 == 31)
+	    col ^= 0x00008080;
+    }
 }
 
