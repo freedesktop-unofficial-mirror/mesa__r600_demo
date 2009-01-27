@@ -681,3 +681,20 @@ void write_register (adapter_t *adapt, uint32_t reg, uint32_t val)
 }
 
 
+uint32_t *create_sample_texture (int width, int height, int pitch)
+{
+    int y, x;
+    uint32_t *tex = malloc (pitch * height * sizeof(uint32_t));
+    uint32_t *t = tex;
+    for (y = 0; y < height; y++) {
+	for (x = 0; x < width; x++)
+	    t[x] = ((0x00000001 * (0x100 * x / width))					|
+		    (0x00000100 * (0x100 * y / height))					|
+		    (0x00010000 * (((0x200 * x / width) + (0x200 * y / height)) % 0xff))|
+		    (0xff000000));
+	t += pitch;
+    }
+    return tex;
+}
+
+

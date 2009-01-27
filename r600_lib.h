@@ -118,6 +118,8 @@ void show_state (adapter_t *adapt);
 void dump_register (adapter_t *adapt, uint32_t reg);
 void write_register (adapter_t *adapt, uint32_t reg, uint32_t val);
 
+uint32_t *create_sample_texture (int width, int height, int pitch);
+
 
 /* Demos functions */
 /* r600_basic.c : */
