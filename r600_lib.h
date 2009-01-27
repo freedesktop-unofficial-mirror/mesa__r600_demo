@@ -106,6 +106,8 @@ void dump_shader (adapter_t *adapt, uint32_t *shader, int size, char *what);
 
 /* FIXME: naming: this waits on the CPU, while the others let the CP wait only */
 void wait_reg (adapter_t *adapt, uint32_t reg, uint32_t v, const char *when);
+float wait_reg_time (adapter_t *adapt, uint32_t reg, uint32_t v, const char *when, float maxtime);
+float time_flush_cmds (adapter_t *adapt, float maxtime);
 
 void wait_3d_idle_clean(void);
 void wait_3d_idle(void);
@@ -137,6 +139,8 @@ void tmp_test           (adapter_t *);
 /* r600_exa.c : */
 void test_solid(adapter_t *adapt);
 void test_copy(adapter_t *adapt);
+/* r600_perf.c : */
+void test_tex_quad_perf (adapter_t *);
 
 
 #endif

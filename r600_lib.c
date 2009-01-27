@@ -34,6 +34,7 @@
 #include <unistd.h>
 #include <math.h>
 #include <assert.h>
+#include <sys/time.h>
 
 #include "r600_reg.h"
 #include "r600_emit.h"
@@ -65,6 +66,33 @@ void wait_reg (adapter_t *adapt, uint32_t reg, uint32_t v, const char *when)
 	exit (1);
     } else if (verbose >= 2)
 	fprintf (stderr, "%s: set correctly after %d loops: 0x%x\n", when, i, v);
+}
+
+float wait_reg_time (adapter_t *adapt, uint32_t reg, uint32_t v, const char *when, float maxtime)
+{
+    struct timeval start, end;
+    int i;
+    float diff;
+
+    gettimeofday (&start, NULL);
+    do {
+	for (i = 0; i < 1e6; i++)
+	    if (reg_read32 (reg) == v)
+		break;
+	gettimeofday (&end, NULL);
+	diff = end.tv_sec - start.tv_sec + ((float)end.tv_usec - start.tv_usec) / 1e6;
+    } while (i == 1e6 && diff < maxtime);
+
+    if (i == 1e6) {
+	fprintf (stderr, "***** %s: still not set after %f seconds: 0x%x, should be 0x%x\n",
+		 when, diff, reg_read32 (reg), v);
+	show_state (adapt);
+	fprintf (stderr, "***** FAILED\n\n");
+	exit (1);
+    } else if (verbose >= 2)
+	fprintf (stderr, "%s: set correctly after %f seconds: 0x%x\n", when, diff, v);
+
+    return diff;
 }
 
 void wait_3d_idle_clean()
@@ -221,7 +249,7 @@ uint64_t upload (adapter_t *adapt, void *shader, int size, int offset)
 #endif
     if (verbose >= 2) {
 	int i;
-	printf ("Upload %d dwords to offset 0x%x:\n", size/4, offset);
+	printf ("Upload %d dwords to offset 0x%x -> 0x"PRINTF_UINT64_HEX"\n", size/4, offset, addr);
 	for (i = 0; i < size/4; i++)
 	    printf ("  %08x%s", ((uint32_t *)shader)[i], (i & 7) == 7 ? "\n":"");
 	if ((i & 7) != 0)
@@ -697,4 +725,18 @@ uint32_t *create_sample_texture (int width, int height, int pitch)
     return tex;
 }
 
+
+float time_flush_cmds (adapter_t *adapt, float maxtime)
+{
+    reg_write32 (SCRATCH_REG5, 0xdeadbeef);
+    wait_reg    (adapt, SCRATCH_REG5, 0xdeadbeef, "time_flush_cmds: init");
+
+    wait_3d_idle_clean();
+    pack0       (SCRATCH_REG5, 1);
+    e32         (0xcafebabe);
+
+    flush_cmds  ();
+
+    return wait_reg_time (adapt, SCRATCH_REG5, 0xcafebabe, "time_flush_cmds: fence", maxtime);
+}
 

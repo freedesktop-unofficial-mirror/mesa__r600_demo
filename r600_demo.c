@@ -509,6 +509,8 @@ void usage (char *argv[]) {
 	    "e\tEXA solid test\n"
 	    "E\tEXA copy test\n"
 	    "\n"
+	    "P\ttextured pixel performance test\n"
+	    "\n"
 	    "[reg]s are dumped (also ranges) or written to, register addresses in hex\n"
 	    "\n",
 	    argv[0]);
@@ -596,7 +598,7 @@ int main(int argc, char *argv[])
     
     adapter.color_gpu      = display_gpu;
     adapter.color_pitch    = display_width;
-    adapter.color_height   = 480;
+    adapter.color_height   = display_height;
 
     adapter.depth_gpu      = display_gpu + display_width*4*500;
     adapter.depth_pitch    = display_width;
@@ -689,6 +691,9 @@ int main(int argc, char *argv[])
 	    break;
 	case 'E':
 	    test_copy (&adapter);
+	    break;
+	case 'P':
+	    test_tex_quad_perf (&adapter);
 	    break;
 	default:
 	    fprintf (stderr, "***** Don't know '%c' test\n\n", argv[optind][i]);
