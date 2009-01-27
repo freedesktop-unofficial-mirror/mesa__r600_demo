@@ -601,8 +601,11 @@ void set_default_state(adapter_t *adapt)
     // ASIC specific setup, see drm
     CMD_BUFFER_ALLOC (5*2);
     if (adapt->chipset <= CHIPSET_RV670) {
+/*
+ * This should either be TA_CNTL, or nuked, or the argument adapted.
 	EREG  (TA_CNTL_AUX,                     (( 3 << GRADIENT_CREDIT_shift)		|
 						 (28 << TD_FIFO_CREDIT_shift)));
+ */
 	EREG  (VC_ENHANCE,                      0);
 	EREG  (R7xx_SQ_DYN_GPR_CNTL_PS_FLUSH_REQ, 0);
 	EREG  (DB_DEBUG,                        0x82000000); /* ? */
@@ -613,8 +616,11 @@ void set_default_state(adapter_t *adapt)
 						 (16 << DEPTH_CACHELINE_FREE_shift)	|
 						 0));
     } else {
+/*
+ * This should either be TA_CNTL, or nuked, or the argument adapted.
 	EREG (TA_CNTL_AUX,                      (( 2 << GRADIENT_CREDIT_shift)		|
 						 (28 << TD_FIFO_CREDIT_shift)));
+ */
 	EREG (VC_ENHANCE,                       0);
 	EREG (R7xx_SQ_DYN_GPR_CNTL_PS_FLUSH_REQ, VS_PC_LIMIT_ENABLE_bit);
 	EREG (DB_DEBUG,                         0);
