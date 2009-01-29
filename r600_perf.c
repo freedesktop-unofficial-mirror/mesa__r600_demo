@@ -755,7 +755,7 @@ void test_alu_quad_perf(adapter_t *adapt)
     /* Render n times, duplicate alu instructions per clause each time */
     render_num = 64;
 
-    for (alu_num = 1; alu_num <= MAX_NUM_ALUS_PER_CLAUSE; alu_num *= 2) {
+    for (alu_num = 3; alu_num <= MAX_NUM_ALUS_PER_CLAUSE; alu_num *= 2) {
 
 	/* Set number of alu insts per clause */
 	for (i = 0; i < NUM_ALU_CLAUSES; i++) {
