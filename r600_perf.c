@@ -38,7 +38,7 @@
 
 
 #define MAX_NUM_QUADS		32768
-#define MAX_NUM_ALUS_PER_CLAUSE	(128/4)		// Max component insts per ALU clause: 128
+#define MAX_NUM_ALUS_PER_CLAUSE	(128/5)		// Max component insts per ALU clause: 128
 #define NUM_ALU_CLAUSES		8		// Number of ALU clauses
 #define RENDER_QUAD_WIDTH	480		// Not 1:1 by intention
 #define RENDER_QUAD_HEIGHT	600
@@ -499,7 +499,7 @@ void test_alu_quad_perf(adapter_t *adapt)
 	VTX_DWORD_PAD,
     } ;
 
-    static uint32_t ps[2*NUM_ALU_CLAUSES + 2 + 4*2*MAX_NUM_ALUS_PER_CLAUSE];
+    static uint32_t ps[2*NUM_ALU_CLAUSES + 2 + 5*2*MAX_NUM_ALUS_PER_CLAUSE];
 
     struct {
 	float x, y;
@@ -627,7 +627,7 @@ void test_alu_quad_perf(adapter_t *adapt)
 				   SRC1_NEG(0),
 				   INDEX_MODE(SQ_INDEX_AR_X),
 				   PRED_SEL(SQ_PRED_SEL_OFF),
-				   LAST(1));
+				   LAST(0));
 	ps[ps_size++] = ALU_DWORD1_OP2(adapt->chipset,
 				       SRC0_ABS(0),
 				       SRC1_ABS(0),
@@ -639,6 +639,31 @@ void test_alu_quad_perf(adapter_t *adapt)
 				       ALU_INST(SQ_OP2_INST_MUL),
 				       BANK_SWIZZLE(SQ_ALU_VEC_012),
 				       DST_GPR(127),
+				       DST_REL(ABSOLUTE),
+				       DST_ELEM(ELEM_W),
+				       CLAMP(0));
+	ps[ps_size++] = ALU_DWORD0(SRC0_SEL(1),                   /* ALU inst e */
+				   SRC0_REL(ABSOLUTE),
+				   SRC0_ELEM(ELEM_W),
+				   SRC0_NEG(0),
+				   SRC1_SEL(0),
+				   SRC1_REL(ABSOLUTE),
+				   SRC1_ELEM(ELEM_W),
+				   SRC1_NEG(0),
+				   INDEX_MODE(SQ_INDEX_AR_X),
+				   PRED_SEL(SQ_PRED_SEL_OFF),
+				   LAST(1));
+	ps[ps_size++] = ALU_DWORD1_OP2(adapt->chipset,
+				       SRC0_ABS(0),
+				       SRC1_ABS(0),
+				       UPDATE_EXECUTE_MASK(0),
+				       UPDATE_PRED(0),
+				       WRITE_MASK(1),
+				       FOG_MERGE(0),
+				       OMOD(SQ_ALU_OMOD_OFF),
+				       ALU_INST(SQ_OP2_INST_MUL),
+				       BANK_SWIZZLE(SQ_ALU_VEC_012),
+				       DST_GPR(126),
 				       DST_REL(ABSOLUTE),
 				       DST_ELEM(ELEM_W),
 				       CLAMP(0));
@@ -762,7 +787,7 @@ void test_alu_quad_perf(adapter_t *adapt)
 	    ps[i*2+1] = CF_ALU_DWORD1(KCACHE_MODE1(0),
 				      KCACHE_ADDR0(0),
 				      KCACHE_ADDR1(0),
-				      COUNT(4*alu_num),
+				      COUNT(5*alu_num),
 				      USES_WATERFALL(0),
 				      CF_INST(SQ_CF_INST_ALU),
 				      WHOLE_QUAD_MODE(0),
@@ -791,7 +816,7 @@ void test_alu_quad_perf(adapter_t *adapt)
 	printf ("\n  ALU speed: %d clauses, %d ALUs -> %.1f Megapixels/s -> %.2f GigaFLOPS\n\n",
 		NUM_ALU_CLAUSES, alu_num,
 		(float) render_num * (RENDER_QUAD_WIDTH * RENDER_QUAD_HEIGHT / 1e6) / render_time,
-		(float) 4 * render_num * alu_num * NUM_ALU_CLAUSES * (RENDER_QUAD_WIDTH * RENDER_QUAD_HEIGHT / 1e9) / render_time);
+		(float) 5 * render_num * alu_num * NUM_ALU_CLAUSES * (RENDER_QUAD_WIDTH * RENDER_QUAD_HEIGHT / 1e9) / render_time);
     }
 }
 
