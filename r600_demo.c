@@ -693,7 +693,7 @@ int main(int argc, char *argv[])
 	    test_copy (&adapter);
 	    break;
 	case 'P':
-	    test_tex_quad_perf (&adapter);
+	    test_perf (&adapter);
 	    break;
 	default:
 	    fprintf (stderr, "***** Don't know '%c' test\n\n", argv[optind][i]);
