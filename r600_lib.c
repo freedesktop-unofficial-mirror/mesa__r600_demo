@@ -205,19 +205,46 @@ void flush_cmds (void)
 }
 
 
-void flush_gpu_input_cache (void)
+void flush_gpu_source_cache (adapter_t *adapt, uint64_t lower, uint64_t upper)
 {
     /* To be used after texture uploads etc. */
-    pack3 (IT_SURFACE_SYNC, 4);
-    e32   (TC_ACTION_ENA_bit | VC_ACTION_ENA_bit | SH_ACTION_ENA_bit | CR0_ACTION_ENA_bit);
-    e32   (0xffffffff);			/* SIZE */
-    e32   (0);				/* BASE */
-    e32   (1);				/* POLL_INTERVAL useful value? */
+#if 0
+    CMD_BUFFER_PREAMBLE (3*2 + 7);
+    lower = lower & ~0xffULL;
+    upper = (upper + 0xff) & ~0xffULL;
+
+    EREG  (CP_COHER_CNTL,                       TC_ACTION_ENA_bit | VC_ACTION_ENA_bit |
+						CB_ACTION_ENA_bit | DB_ACTION_ENA_bit |
+						SH_ACTION_ENA_bit | SMX_ACTION_ENA_bit);
+    EREG  (CP_COHER_SIZE,			(upper - lower) >> 8);
+    EREG  (CP_COHER_BASE,			lower >> 8);
+    PACK3 (IT_WAIT_REG_MEM, 6);
+    E32   (0x00000003);						// ME, Register, EqualTo
+    E32   (CP_COHER_STATUS >> 2);
+    E32   (0);
+    E32   (0);							// Ref value
+    E32   (STATUS_bit);						// Ref mask
+    E32   (10);							// Wait interval
+#endif
+    CMD_BUFFER_PREAMBLE (5);
+    lower = lower & ~0xffULL;
+    upper = (upper + 0xff) & ~0xffULL;
+    if (verbose >= 1)
+	printf ("  GPU source cache clear %08x00 - %08x00\n",
+		(uint32_t) (lower >> 8), (uint32_t)(upper >> 8));
+
+    PACK3 (IT_SURFACE_SYNC, 4);
+    E32   (TC_ACTION_ENA_bit | VC_ACTION_ENA_bit | CB_ACTION_ENA_bit | DB_ACTION_ENA_bit |
+	   SH_ACTION_ENA_bit | SMX_ACTION_ENA_bit);	/* CNTL */
+    E32   ((upper-lower) >> 8);		/* SIZE */
+    E32   (lower >> 8);			/* BASE */
+    E32   (10);				/* POLL_INTERVAL */
 }
 
 
-void flush_gpu_output_cache (void)
+void flush_gpu_dest_cache (adapter_t *adapt, uint64_t lower, uint64_t upper)
 {
+    // TODO: not correct at all yet
     /* To be used before readpixels, copy-to-texture etc. */
     pack3 (IT_SURFACE_SYNC, 4);
     e32   (TC_ACTION_ENA_bit | VC_ACTION_ENA_bit | SH_ACTION_ENA_bit | CR0_ACTION_ENA_bit);
@@ -255,6 +282,7 @@ uint64_t upload (adapter_t *adapt, void *shader, int size, int offset)
 	if ((i & 7) != 0)
 	    printf ("\n");
     }
+    flush_gpu_source_cache (adapt, addr, addr + size);
     return addr;
 }
 

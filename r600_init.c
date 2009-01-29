@@ -294,26 +294,6 @@ void set_depth_target(adapter_t *adapt, db_config_t *db_conf)
 			   (0 << SLICE_MAX_shift)));
 }
 
-void cp_set_surface_sync()
-{
-    CMD_BUFFER_PREAMBLE (4*2 + 7 + 2 + 2);
-
-    EREG  (CP_COHER_CNTL,                       0x19800000);
-    EREG  (CP_COHER_SIZE,                       0xFFFFFFFF);
-    EREG  (CP_COHER_BASE,                       0x00000000);
-    PACK3 (IT_WAIT_REG_MEM, 6);
-    E32   (0x00000003);						// ME, Register, EqualTo
-    E32   (CP_COHER_STATUS >> 2);
-    E32   (0);
-    E32   (0);							// Ref value
-    E32   (STATUS_bit);						// Ref mask
-    E32   (10);							// Wait interval
-    PACK3 (IT_EVENT_WRITE, 1);
-    E32   (PIPELINESTAT_STOP);
-    PACK3 (IT_EVENT_WRITE, 1);
-    E32   (PERFCOUNTER_STOP);
-}
-
 void fs_setup(adapter_t *adapt, shader_config_t *fs_conf)
 {
     uint32_t sq_pgm_resources;

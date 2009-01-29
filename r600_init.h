@@ -38,7 +38,6 @@ void reset_bool_loop_const (adapter_t *adapt);
 void sq_setup (adapter_t *adapt, sq_config_t *sq_conf);
 void set_render_target (adapter_t *adapt, cb_config_t *cb_conf);
 void set_depth_target (adapter_t *adapt, db_config_t *db_conf);
-void cp_set_surface_sync (void);
 void fs_setup (adapter_t *adapt, shader_config_t *fs_conf);
 void vs_setup (adapter_t *adapt, shader_config_t *vs_conf);
 void ps_setup (adapter_t *adapt, shader_config_t *ps_conf);

@@ -251,9 +251,6 @@ R600PrepareSolid(adapter_t *adapt, int alu, uint32_t pm, uint32_t fg)
 
     /* Init */
     start_3d(adapt);
-
-    cp_set_surface_sync();
-
     set_default_state(adapt);
 
     /* Scissor / viewport */
@@ -748,9 +745,6 @@ R600PrepareCopy(adapter_t *adapt,
 
     /* Init */
     start_3d(adapt);
-
-    cp_set_surface_sync();
-
     set_default_state(adapt);
 
     /* Scissor / viewport */
