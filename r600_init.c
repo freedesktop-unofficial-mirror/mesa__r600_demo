@@ -169,6 +169,7 @@ void sq_setup(adapter_t *adapt, sq_config_t *sq_conf)
     if ((adapt->chipset == CHIPSET_RV610) ||
 	(adapt->chipset == CHIPSET_RV620) ||
 	(adapt->chipset == CHIPSET_RS780) ||
+	(adapt->chipset == CHIPSET_M72)   ||
 	(adapt->chipset == CHIPSET_RV710))
 	sq_config = 0;						// no VC
     else
@@ -660,7 +661,7 @@ void set_default_state(adapter_t *adapt)
 
     // XXX: move to drm
     reg = reg_read32 (CC_GC_SHADER_PIPE_CONFIG);
-    if (adapt->chipset <= CHIPSET_RV770)
+    if (adapt->chipset < CHIPSET_RV770)
 	sq_conf.num_qd_pipes = R6XX_MAX_QD_PIPES - count_bits (reg & INACTIVE_QD_PIPES_mask);
     else
 	sq_conf.num_qd_pipes = 4;				/* TODO: Verfiy (This is from TCore) */

@@ -63,9 +63,12 @@ extern int do_not_flush;
 enum chipset_e {
     CHIPSET_NONE = 0,
     CHIPSET_R600,
-    CHIPSET_RV610, CHIPSET_RV620, CHIPSET_RS780, // no VC
+    CHIPSET_RV610, CHIPSET_RV620,		// no VC
+    CHIPSET_RS780, CHIPSET_M72,			// no VC
     CHIPSET_RV630, CHIPSET_RV635, CHIPSET_RV670,
-    CHIPSET_RV770, CHIPSET_RV710, CHIPSET_RV730
+    CHIPSET_RV770,
+    CHIPSET_RV710,				// no VC
+    CHIPSET_RV730
 };
 
 /* TODO: Should go to _hwapi.h, probably renamed context_t */

@@ -400,6 +400,9 @@ void read_registers(void)
     case 0x9614:
 	adapter.chipset = CHIPSET_RS780;
 	break;
+    case 0x94C9:    case 0x94CB:
+	adapter.chipset = CHIPSET_M72;
+	break;
     case 0x9440:    case 0x9442:    case 0x9444:    case 0x9446:
     case 0x944C:    case 0x944E:    case 0x9456:
 	adapter.chipset = CHIPSET_RV770;
@@ -413,8 +416,7 @@ void read_registers(void)
     case 0x949F:
 	adapter.chipset = CHIPSET_RV730;
 	break;
-    case 0x94C8: /* RHD_M74 */    case 0x94C9: /* RHD_M72 */
-    case 0x94CB: /* RHD_M72 */    case 0x9504: /* RHD_M88 */
+    case 0x94C8: /* RHD_M74 */    case 0x9504: /* RHD_M88 */
     case 0x9506: /* RHD_M88 */    case 0x9508: /* RHD_M88 */
     case 0x9509: /* RHD_M88 */    case 0x9581: /* RHD_M76 */
     case 0x9583: /* RHD_M76 */    case 0x958B: /* RHD_M76 */
@@ -444,6 +446,9 @@ void read_registers(void)
 	break;
     case CHIPSET_RS780:
 	fprintf (stderr, "Chipset: RS780\n\n");
+	break;
+    case CHIPSET_M72:
+	fprintf (stderr, "Chipset: M72\n\n");
 	break;
     case CHIPSET_RV770:
 	fprintf (stderr, "Chipset: RV770\n\n");
