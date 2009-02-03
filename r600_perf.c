@@ -731,6 +731,15 @@ void test_alu_quad_perf(adapter_t *adapt, int testtype)
     ereg  (DB_SHADER_CONTROL,                   ((1 << Z_ORDER_shift)		| /* EARLY_Z_THEN_LATE_Z */
 						 DUAL_EXPORT_ENABLE_bit)); /* Only useful if no depth export */
 
+    /* Interpolator setup */
+    ereg  (SPI_PS_IN_CONTROL_0,			((1 << NUM_INTERP_shift)));
+    ereg  (SPI_PS_IN_CONTROL_1,			0);
+    ereg  (SPI_PS_INPUT_CNTL_0 + (0 <<2),       ((0    << SEMANTIC_shift)       |
+						 (0x03 << DEFAULT_VAL_shift)    |
+						 FLAT_SHADE_bit                 |
+						 SEL_CENTROID_bit));
+    ereg  (SPI_INTERP_CONTROL_0,		0);
+
     /* Vertex buffer setup */
     vtx_res.id              = SQ_VTX_RESOURCE_vs;
     vtx_res.vtx_size_dw     = sizeof(*vb)/4;
