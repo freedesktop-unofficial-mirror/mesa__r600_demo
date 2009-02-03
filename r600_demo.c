@@ -514,7 +514,8 @@ void usage (char *argv[]) {
 	    "e\tEXA solid test\n"
 	    "E\tEXA copy test\n"
 	    "\n"
-	    "P\ttextured pixel performance test\n"
+	    "P\tPerformance test\n"
+	    "F\tContinous Full-Power test\n"
 	    "\n"
 	    "[reg]s are dumped (also ranges) or written to, register addresses in hex\n"
 	    "\n",
@@ -698,7 +699,10 @@ int main(int argc, char *argv[])
 	    test_copy (&adapter);
 	    break;
 	case 'P':
-	    test_perf (&adapter);
+	    test_perf (&adapter, 1, 1);
+	    break;
+	case 'F':
+	    test_perf (&adapter, 0, 2);
 	    break;
 	default:
 	    fprintf (stderr, "***** Don't know '%c' test\n\n", argv[optind][i]);

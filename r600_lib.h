@@ -144,7 +144,7 @@ void tmp_test           (adapter_t *);
 void test_solid(adapter_t *adapt);
 void test_copy(adapter_t *adapt);
 /* r600_perf.c : */
-void test_perf (adapter_t *);
+void test_perf (adapter_t *, int textype, int alutype);
 
 
 #endif

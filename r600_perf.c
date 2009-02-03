@@ -47,7 +47,7 @@
  * Test rasterization performance with one texture
  */
 
-void test_tex_quad_perf(adapter_t *adapt)
+void test_tex_quad_perf(adapter_t *adapt, int testtype)
 {
     static uint32_t vs[] = {
 	// CF INST 0
@@ -342,15 +342,13 @@ void test_tex_quad_perf(adapter_t *adapt)
 
     
     /* Interpolator setup */
-    /* Enabling flat shading needs both FLAT_SHADE_bit in SPI_PS_INPUT_CNTL_x
-     * *and* FLAT_SHADE_ENA_bit in SPI_INTERP_CONTROL_0 */
     ereg  (SPI_PS_IN_CONTROL_0,                 ((1 << NUM_INTERP_shift)));
     ereg  (SPI_PS_IN_CONTROL_1,                 0);
     ereg  (SPI_PS_INPUT_CNTL_0 + (0 <<2),       ((0    << SEMANTIC_shift)	|
 						 (0x03 << DEFAULT_VAL_shift)	|
 						 FLAT_SHADE_bit			|
 						 SEL_CENTROID_bit));
-    ereg  (SPI_INTERP_CONTROL_0,                /* FLAT_SHADE_ENA_bit | */ 0);
+    ereg  (SPI_INTERP_CONTROL_0,                0);
 
 
     /* Vertex buffer setup */
@@ -395,7 +393,7 @@ void test_tex_quad_perf(adapter_t *adapt)
  * Test ALU performance
  */
 
-void test_alu_quad_perf(adapter_t *adapt)
+void test_alu_quad_perf(adapter_t *adapt, int testtype)
 {
     static uint32_t vs[] = {
 	// CF INST 0
@@ -515,7 +513,7 @@ void test_alu_quad_perf(adapter_t *adapt)
 
     uint64_t vb_addr, vs_addr, ps_addr;
 
-    int i, ps_size, alu_num, render_num;
+    int i, ps_size, alu_num, alu_scale, render_num;
     float render_time;
 
 
@@ -755,7 +753,13 @@ void test_alu_quad_perf(adapter_t *adapt)
     /* Render n times, duplicate alu instructions per clause each time */
     render_num = 64;
 
-    for (alu_num = 3; alu_num <= MAX_NUM_ALUS_PER_CLAUSE; alu_num *= 2) {
+    alu_num = 3;
+    alu_scale = 2;
+    if (testtype == 2) {
+	alu_num = MAX_NUM_ALUS_PER_CLAUSE;
+	alu_scale = 1;
+    }
+    for (; alu_num <= MAX_NUM_ALUS_PER_CLAUSE; alu_num *= alu_scale) {
 
 	/* Set number of alu insts per clause */
 	for (i = 0; i < NUM_ALU_CLAUSES; i++) {
@@ -801,8 +805,10 @@ void test_alu_quad_perf(adapter_t *adapt)
     }
 }
 
-void test_perf (adapter_t *adapt)
+void test_perf (adapter_t *adapt, int textype, int alutype)
 {
-    test_tex_quad_perf (adapt);
-    test_alu_quad_perf (adapt);
+    if (textype)
+	test_tex_quad_perf (adapt, textype);
+    if (alutype)
+	test_alu_quad_perf (adapt, alutype);
 }
