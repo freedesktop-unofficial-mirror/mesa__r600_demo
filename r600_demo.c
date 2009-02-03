@@ -491,6 +491,7 @@ void usage (char *argv[]) {
 	    "-u\tVertex format unsigned\n"
 	    "-S[0-2]\tVertex alu scale override 0: default  1: alu scale  2: no alu scale\n"
 	    "-n\tDon't flush command buffer on tests, just print (implies -v)\n"
+	    "-p pci:<domain>:<bus>:<dev>.<func>\tManually specify PCI Id (e.g. pci:0000:02:00.1)\n"
 	    "\n"
 	    "Test is composed of:\n"
 	    "\n"
@@ -526,9 +527,10 @@ void usage (char *argv[]) {
 int main(int argc, char *argv[])
 {
     int i, r;
+    char *pciid = NULL;
 
     fprintf (stderr, "\n*** %s, version %s\n\n", argv[0], VERSION);
-    while ((i = getopt(argc, argv, "vrf:i:uS:n")) != -1) {
+    while ((i = getopt(argc, argv, "vrf:i:uS:np:")) != -1) {
 	switch (i) {
 	case 'v':
 	    verbose++;
@@ -558,6 +560,9 @@ int main(int argc, char *argv[])
 	    verbose++;
 	    do_not_flush = 1;
 	    break;
+	case 'p':
+	    pciid = optarg;
+	    break;
 	default:
 	    usage (argv);
 	}
@@ -566,7 +571,10 @@ int main(int argc, char *argv[])
     if (optind >= argc)
 	usage (argv);
 
-    drmFD=drmOpen("radeon", NULL);
+    if (pciid)
+	drmFD=drmOpen(NULL, pciid);
+    else
+	drmFD=drmOpen("radeon", NULL);
     if(drmFD<0){
 	drmError(drmFD, __func__ );
 	fprintf(stderr, "Check that BusId is correct. You can find the correct BusId in /var/log/Xorg.0.log\n");
