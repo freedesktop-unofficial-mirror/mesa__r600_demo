@@ -170,6 +170,8 @@ void sq_setup(adapter_t *adapt, sq_config_t *sq_conf)
 	(adapt->chipset == CHIPSET_RV620) ||
 	(adapt->chipset == CHIPSET_RS780) ||
 	(adapt->chipset == CHIPSET_M72)   ||
+	(adapt->chipset == CHIPSET_M74)   ||
+	(adapt->chipset == CHIPSET_M82)   ||
 	(adapt->chipset == CHIPSET_RV710))
 	sq_config = 0;						// no VC
     else

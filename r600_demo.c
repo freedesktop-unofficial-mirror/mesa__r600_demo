@@ -450,6 +450,12 @@ void read_registers(void)
     case CHIPSET_M72:
 	fprintf (stderr, "Chipset: M72\n\n");
 	break;
+    case CHIPSET_M74:
+	fprintf (stderr, "Chipset: M74\n\n");
+	break;
+    case CHIPSET_M82:
+	fprintf (stderr, "Chipset: M82\n\n");
+	break;
     case CHIPSET_RV770:
 	fprintf (stderr, "Chipset: RV770\n\n");
 	break;
