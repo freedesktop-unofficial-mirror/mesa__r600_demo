@@ -205,7 +205,7 @@ void flush_cmds (void)
 }
 
 
-void flush_gpu_source_cache (adapter_t *adapt, uint64_t lower, uint64_t upper)
+void flush_gpu_source_cache (adapter_t *adapt, uint32_t type, uint64_t lower, uint64_t upper)
 {
     /* To be used after texture uploads etc. */
 #if 0
@@ -213,9 +213,7 @@ void flush_gpu_source_cache (adapter_t *adapt, uint64_t lower, uint64_t upper)
     lower = lower & ~0xffULL;
     upper = (upper + 0xff) & ~0xffULL;
 
-    EREG  (CP_COHER_CNTL,                       TC_ACTION_ENA_bit | VC_ACTION_ENA_bit |
-						CB_ACTION_ENA_bit | DB_ACTION_ENA_bit |
-						SH_ACTION_ENA_bit | SMX_ACTION_ENA_bit);
+    EREG  (CP_COHER_CNTL,			type);
     EREG  (CP_COHER_SIZE,			(upper - lower) >> 8);
     EREG  (CP_COHER_BASE,			lower >> 8);
     PACK3 (IT_WAIT_REG_MEM, 6);
@@ -234,20 +232,19 @@ void flush_gpu_source_cache (adapter_t *adapt, uint64_t lower, uint64_t upper)
 		(uint32_t) (lower >> 8), (uint32_t)(upper >> 8));
 
     PACK3 (IT_SURFACE_SYNC, 4);
-    E32   (TC_ACTION_ENA_bit | VC_ACTION_ENA_bit | CB_ACTION_ENA_bit | DB_ACTION_ENA_bit |
-	   SH_ACTION_ENA_bit | SMX_ACTION_ENA_bit);	/* CNTL */
+    E32   (type);
     E32   ((upper-lower) >> 8);		/* SIZE */
     E32   (lower >> 8);			/* BASE */
     E32   (10);				/* POLL_INTERVAL */
 }
 
 
-void flush_gpu_dest_cache (adapter_t *adapt, uint64_t lower, uint64_t upper)
+void flush_gpu_dest_cache (adapter_t *adapt, uint32_t type, uint64_t lower, uint64_t upper)
 {
     // TODO: not correct at all yet
     /* To be used before readpixels, copy-to-texture etc. */
     pack3 (IT_SURFACE_SYNC, 4);
-    e32   (TC_ACTION_ENA_bit | VC_ACTION_ENA_bit | SH_ACTION_ENA_bit | CR0_ACTION_ENA_bit);
+    e32   (type);
     e32   (0xffffffff);			/* SIZE */
     e32   (0);				/* BASE */
     e32   (1);				/* POLL_INTERVAL useful value? */
@@ -282,7 +279,7 @@ uint64_t upload (adapter_t *adapt, void *shader, int size, int offset)
 	if ((i & 7) != 0)
 	    printf ("\n");
     }
-    flush_gpu_source_cache (adapt, addr, addr + size);
+    flush_gpu_source_cache (adapt, FLUSH_GPU_INPUT_TYPE_ALL, addr, addr + size);
     return addr;
 }
 
