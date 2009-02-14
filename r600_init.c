@@ -323,7 +323,8 @@ void vs_setup(adapter_t *adapt, shader_config_t *vs_conf)
 	sq_pgm_resources |= SQ_PGM_RESOURCES_VS__DX10_CLAMP_bit;
     if (vs_conf->fetch_cache_lines)
 	sq_pgm_resources |= (vs_conf->fetch_cache_lines << FETCH_CACHE_LINES_shift);
-    if (vs_conf->uncached_first_inst)
+    if (vs_conf->uncached_first_inst ||
+	adapt->chipset == CHIPSET_R600)		// Workaround for bug in R600
 	sq_pgm_resources |= UNCACHED_FIRST_INST_bit;
 
     EREG (SQ_PGM_START_VS, vs_conf->shader_addr >> 8);
@@ -342,7 +343,8 @@ void ps_setup(adapter_t *adapt, shader_config_t *ps_conf)
 	sq_pgm_resources |= SQ_PGM_RESOURCES_PS__DX10_CLAMP_bit;
     if (ps_conf->fetch_cache_lines)
 	sq_pgm_resources |= (ps_conf->fetch_cache_lines << FETCH_CACHE_LINES_shift);
-    if (ps_conf->uncached_first_inst)
+    if (ps_conf->uncached_first_inst ||
+	adapt->chipset == CHIPSET_R600)		// Workaround for bug in R600
 	sq_pgm_resources |= UNCACHED_FIRST_INST_bit;
     if (ps_conf->clamp_consts)
 	sq_pgm_resources |= CLAMP_CONSTS_bit;
