@@ -301,6 +301,18 @@ void tmp_test(adapter_t *adapt)
     draw_conf.index_type         = DI_INDEX_SIZE_16_BIT;
     draw_auto (adapt, &draw_conf);
 
+# if 1		// This crashes the machine reliably, at least on M72
+    wait_3d_full_idle_clean();
+    ereg  (VGT_INSTANCE_STEP_RATE_0,            0);	/* ? */
+    ereg  (VGT_INSTANCE_STEP_RATE_1,            0);
+
+    ereg  (VGT_MAX_VTX_INDX,                    vtx_res.vtx_num_entries / vtx_res.vtx_size_dw);
+    ereg  (VGT_MIN_VTX_INDX,                    0);
+    ereg  (VGT_INDX_OFFSET,                     0);
+    wait_3d_full_idle_clean();
+#endif
+
+
     /* Draw 2 */
     draw_conf.prim_type          = DI_PT_TRILIST;
     draw_conf.vgt_draw_initiator = DI_SRC_SEL_AUTO_INDEX;
