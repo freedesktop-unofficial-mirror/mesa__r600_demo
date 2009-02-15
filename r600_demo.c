@@ -64,6 +64,7 @@ drmBufMapPtr BufMapPtr=NULL;
 
 volatile void *registers=NULL;
 void *framebuffer=NULL;
+int framebuffer_size=0;
 
 int display_width, display_height;
 uint32_t display_gpu;		// Should be 64bit, but is currently 32bit address in R6xx, R7xx chips
@@ -166,6 +167,7 @@ void GetMaps(void)
 	    typename = "FB";  
 	    if((r=drmMap(drmFD, offset, size, &framebuffer))<0)
 		drmError(r, "drm: DRM_FRAME_BUFFER");
+	    framebuffer_size = size;
 	    break;
 	case DRM_REGISTERS:      
 	    typename = "REG"; 
@@ -607,6 +609,7 @@ int main(int argc, char *argv[])
     reg_write32 (SCRATCH_REG7, 0);
 
     adapter.framebuffer    = framebuffer;
+    adapter.framebuffer_size = framebuffer_size;
     if (verbose >= 2)
 	fprintf(stderr, "framebuffer cpu %p, gpu 0x" PRINTF_UINT64_HEX "\n",
 		framebuffer, adapter.framebuffer_gpu);
@@ -625,8 +628,8 @@ int main(int argc, char *argv[])
     adapter.depth_height   = 480;
 
     if (verbose >= 1) {
-	fprintf (stderr, "\nfb:       gpu 0x" PRINTF_UINT64_HEX ", cpu %p\n",
-		 adapter.framebuffer_gpu, adapter.framebuffer);
+	fprintf (stderr, "\nfb:       gpu 0x" PRINTF_UINT64_HEX ", cpu %p, size 0x" PRINTF_UINT64_HEX "\n",
+		 adapter.framebuffer_gpu, adapter.framebuffer, adapter.framebuffer_size);
 	fprintf (stderr, "display:  gpu 0x" PRINTF_UINT64_HEX ", cpu %p  (%dx%d) @%d\n",
 		 adapter.display_gpu, adapter.display, adapter.display_width, adapter.display_height, adapter.display_pitch);
 	fprintf (stderr, "color RT: gpu 0x" PRINTF_UINT64_HEX "  (%dx%d)\n",

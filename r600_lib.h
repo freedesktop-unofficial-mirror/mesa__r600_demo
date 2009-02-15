@@ -78,6 +78,7 @@ typedef struct {
 
     void    *framebuffer;
     uint64_t framebuffer_gpu;
+    uint64_t framebuffer_size;
 
     void    *display;
     uint64_t display_gpu;
