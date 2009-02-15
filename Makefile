@@ -4,7 +4,7 @@ INCLUDES=-I/usr/include/drm
 LIBS=-ldrm
 CFLAGS:=-Wall -O0 -g $(INCLUDES) $(VERSION_FLAGS) $(CFLAGS)
 CC=gcc
-CFILES=r600_demo.c r600_lib.c r600_basic.c r600_init.c r600_triangles.c r600_texture.c r600_pm4.c r600_exa.c r600_perf.c
+CFILES=r600_demo.c r600_lib.c r600_basic.c r600_init.c r600_triangles.c r600_texture.c r600_pm4.c r600_exa.c r600_perf.c r600_tmp.c
 
 all:  r600_demo convert_shader
 

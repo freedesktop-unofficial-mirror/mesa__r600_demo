@@ -381,10 +381,3 @@ void quad_test_tex_scaled(adapter_t *adapt)
 
 }
 
-/*
- * Temporary test
- */
-
-void tmp_test(adapter_t *adapt)
-{
-}
