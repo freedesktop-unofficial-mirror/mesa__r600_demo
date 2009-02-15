@@ -120,6 +120,7 @@ float time_flush_cmds (adapter_t *adapt, float maxtime);
 
 void wait_3d_idle_clean(void);
 void wait_3d_idle(void);
+void wait_3d_full_idle_clean (void);
 
 void simple_clear (adapter_t* adapt);
 

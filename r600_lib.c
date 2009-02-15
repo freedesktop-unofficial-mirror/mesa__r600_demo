@@ -111,6 +111,30 @@ void wait_3d_idle()
 }
 
 
+void wait_3d_full_idle_clean ()
+{
+    CMD_BUFFER_PREAMBLE (2 + 7);
+    
+    //flush caches, don't generate timestamp
+    PACK3 (IT_EVENT_WRITE, 1);
+    E32   (CACHE_FLUSH_AND_INV_EVENT);
+
+    // wait_3d_idle_clean doesn't actually wait for the engine to be idle
+    // but stalls later memory writes by the CP
+    PACK3 (IT_WAIT_REG_MEM, 6);
+    E32   (0x00000003);						// ME, Register, EqualTo
+    E32   (GRBM_STATUS >> 2);
+    E32   (0);
+    E32   (CB03_CLEAN_bit | DB03_CLEAN_bit);			// Ref value
+    E32   (CB03_BUSY_bit | CR_BUSY_bit | DB03_BUSY_bit | PA_BUSY_bit |
+	   SC_BUSY_bit | SMX_BUSY_bit | SPI03_BUSY_bit | SH_BUSY_bit |
+	   SX_BUSY_bit | GRBM_STATUS__TC_BUSY_bit | TA03_BUSY_bit |
+	   VGT_BUSY_NO_DMA_bit | GRBM_STATUS__VC_BUSY_bit |
+	   CB03_CLEAN_bit | DB03_CLEAN_bit);			// Ref mask
+    E32   (10);							// Wait interval
+}
+
+
 void flush_indirect (void)
 {
     drm_radeon_indirect_t  ind;
@@ -258,7 +282,7 @@ void flush_gpu_dest_cache (adapter_t *adapt, uint32_t type, uint64_t lower, uint
 
 // store shaders/buffers in vram or sysram
 // vram assumes 1024x768 @ 32 bpp, buffers stored after front buffer
-//#define SYS_MEM 1
+#define SYS_MEM 1
 
 /* Write shader/buffer to agreed upon location (with offset) and return address */
 uint64_t upload (adapter_t *adapt, void *shader, int size, int offset)
@@ -756,7 +780,7 @@ float time_flush_cmds (adapter_t *adapt, float maxtime)
     reg_write32 (SCRATCH_REG5, 0xdeadbeef);
     wait_reg    (adapt, SCRATCH_REG5, 0xdeadbeef, "time_flush_cmds: init");
 
-    wait_3d_idle_clean();
+    wait_3d_full_idle_clean();
     pack0       (SCRATCH_REG5, 1);
     e32         (0xcafebabe);
 
