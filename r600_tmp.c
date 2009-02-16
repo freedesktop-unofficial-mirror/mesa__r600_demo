@@ -282,7 +282,7 @@ void tmp_test(adapter_t *adapt)
     ereg  (VGT_INSTANCE_STEP_RATE_0,            0);	/* ? */
     ereg  (VGT_INSTANCE_STEP_RATE_1,            0);
 
-    // May not be set again after starting to draw
+    // set_render_target() necessary before or after setting those
     ereg  (VGT_MAX_VTX_INDX,                    vtx_res.vtx_num_entries / vtx_res.vtx_size_dw);
     ereg  (VGT_MIN_VTX_INDX,                    0);
     ereg  (VGT_INDX_OFFSET,                     0);
@@ -296,13 +296,15 @@ void tmp_test(adapter_t *adapt)
     draw_conf.index_type         = DI_INDEX_SIZE_16_BIT;
     draw_auto (adapt, &draw_conf);
 
-    wait_3d_idle_clean ();
-    wait_3d_full_idle_clean ();
-// Any of those three (changing the pixel shader) will eventually crash the machine (including drm oopses)
-//    ps_setup                    (adapt, &ps_conf);
-//    ereg (SQ_PGM_START_PS, ps_conf.shader_addr >> 8);
-//    ereg (SQ_PGM_CF_OFFSET_FS, 0);
-    
+
+    set_render_target(adapt, &cb_conf);
+
+    /* Shader */
+    // set_render_target() necessary before or after setting those
+    vs_setup                    (adapt, &vs_conf);
+    ps_setup                    (adapt, &ps_conf);
+
+
     /* Vertex buffer setup 2 */
     vtx_res.id              = SQ_VTX_RESOURCE_vs;
     vtx_res.vtx_size_dw     = sizeof(vertex_t) / 4;
