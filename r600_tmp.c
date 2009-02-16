@@ -264,16 +264,10 @@ void tmp_test(adapter_t *adapt)
 
     /* Interpolator setup */
     ereg  (SPI_PS_IN_CONTROL_0,                 ((1 << NUM_INTERP_shift)));
-//						 (1 << BARYC_SAMPLE_CNTL_shift)	|
-//						 PERSP_GRADIENT_ENA_bit));
     ereg  (SPI_PS_IN_CONTROL_1,                 0);
     ereg  (SPI_PS_INPUT_CNTL_0 + (0 <<2),       ((0    << SEMANTIC_shift)	|
 						 (0x03 << DEFAULT_VAL_shift)	|
 						 SEL_CENTROID_bit));
-/*    ereg  (SPI_INTERP_CONTROL_0,                ((2 << PNT_SPRITE_OVRD_X_shift)	|
-						 (3 << PNT_SPRITE_OVRD_Y_shift)	|
-						 (0 << PNT_SPRITE_OVRD_Z_shift)	|
-						 (1 << PNT_SPRITE_OVRD_W_shift)));*/
     ereg (SPI_INTERP_CONTROL_0,			0);
 
 
@@ -288,6 +282,7 @@ void tmp_test(adapter_t *adapt)
     ereg  (VGT_INSTANCE_STEP_RATE_0,            0);	/* ? */
     ereg  (VGT_INSTANCE_STEP_RATE_1,            0);
 
+    // May not be set again after starting to draw
     ereg  (VGT_MAX_VTX_INDX,                    vtx_res.vtx_num_entries / vtx_res.vtx_size_dw);
     ereg  (VGT_MIN_VTX_INDX,                    0);
     ereg  (VGT_INDX_OFFSET,                     0);
@@ -301,23 +296,27 @@ void tmp_test(adapter_t *adapt)
     draw_conf.index_type         = DI_INDEX_SIZE_16_BIT;
     draw_auto (adapt, &draw_conf);
 
-# if 1		// This crashes the machine reliably, at least on M72
-    wait_3d_full_idle_clean();
-    ereg  (VGT_INSTANCE_STEP_RATE_0,            0);	/* ? */
-    ereg  (VGT_INSTANCE_STEP_RATE_1,            0);
-
-    ereg  (VGT_MAX_VTX_INDX,                    vtx_res.vtx_num_entries / vtx_res.vtx_size_dw);
-    ereg  (VGT_MIN_VTX_INDX,                    0);
-    ereg  (VGT_INDX_OFFSET,                     0);
-    wait_3d_full_idle_clean();
-#endif
+    wait_3d_idle_clean ();
+    wait_3d_full_idle_clean ();
+// Any of those three (changing the pixel shader) will eventually crash the machine (including drm oopses)
+//    ps_setup                    (adapt, &ps_conf);
+//    ereg (SQ_PGM_START_PS, ps_conf.shader_addr >> 8);
+//    ereg (SQ_PGM_CF_OFFSET_FS, 0);
+    
+    /* Vertex buffer setup 2 */
+    vtx_res.id              = SQ_VTX_RESOURCE_vs;
+    vtx_res.vtx_size_dw     = sizeof(vertex_t) / 4;
+    vtx_res.vtx_num_entries = sizeof(vb) / 4;		/* Can overcommit if necessary */
+    vtx_res.mem_req_size    = 1;
+    vtx_res.vb_addr         = vb_addr + sizeof(vertex_t)*6;
+    set_vtx_resource        (adapt, &vtx_res);
 
 
     /* Draw 2 */
     draw_conf.prim_type          = DI_PT_TRILIST;
     draw_conf.vgt_draw_initiator = DI_SRC_SEL_AUTO_INDEX;
     draw_conf.num_instances      = 1;
-    draw_conf.num_indices        = 9;
+    draw_conf.num_indices        = 3;
     draw_conf.index_type         = DI_INDEX_SIZE_16_BIT;
     draw_auto (adapt, &draw_conf);
     
