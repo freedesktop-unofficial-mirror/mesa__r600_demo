@@ -280,31 +280,33 @@ void flush_gpu_dest_cache (adapter_t *adapt, uint32_t type, uint64_t lower, uint
 */
 }
 
-// store shaders/buffers in vram or sysram
-// vram assumes 1024x768 @ 32 bpp, buffers stored after front buffer
-#define SYS_MEM 1
-
 /* Write shader/buffer to agreed upon location (with offset) and return address */
-uint64_t upload (adapter_t *adapt, void *shader, int size, int offset)
+static uint64_t do_upload (adapter_t *adapt, uint64_t addr_gpu, void *addr_cpu, void *input, int size, int offset)
 {
-    uint64_t addr;
-#ifdef SYS_MEM
-    memcpy (((char *)vtx + offset), shader, size);
-    addr = vtx_gpu + offset;
-#else
-    memcpy (((char *)adapt->framebuffer + (adapt->color_pitch * adapt->color_height * 4) + offset), shader, size);
-    addr = adapt->framebuffer_gpu + (adapt->color_pitch * adapt->color_height * 4) + offset;
-#endif
+    memcpy (addr_cpu, input, size);
     if (verbose >= 2) {
 	int i;
-	printf ("Upload %d dwords to offset 0x%x -> 0x"PRINTF_UINT64_HEX"\n", size/4, offset, addr);
+	printf ("Upload %d dwords to offset 0x%x -> 0x"PRINTF_UINT64_HEX"\n", size/4, offset, addr_gpu);
 	for (i = 0; i < size/4; i++)
-	    printf ("  %08x%s", ((uint32_t *)shader)[i], (i & 7) == 7 ? "\n":"");
+	    printf ("  %08x%s", ((uint32_t *)input)[i], (i & 7) == 7 ? "\n":"");
 	if ((i & 7) != 0)
 	    printf ("\n");
     }
-    flush_gpu_source_cache (adapt, FLUSH_GPU_INPUT_TYPE_ALL, addr, addr + size);
-    return addr;
+    flush_gpu_source_cache (adapt, FLUSH_GPU_INPUT_TYPE_ALL, addr_gpu, addr_gpu + size);
+    return addr_gpu;
+}
+
+uint64_t upload_gart (adapter_t *adapt, void *input, int size, int offset)
+{
+    return do_upload (adapt, vtx_gpu + offset, (char *)vtx + offset,
+		      input, size, offset);
+}
+
+uint64_t upload_gpu (adapter_t *adapt, void *input, int size, int offset)
+{
+    int off = (adapt->color_pitch * adapt->color_height * 4) + offset;
+    return do_upload (adapt, adapt->framebuffer_gpu + off, (char *)adapt->framebuffer + off,
+		      input, size, offset);
 }
 
 /* Dump shader to screen */

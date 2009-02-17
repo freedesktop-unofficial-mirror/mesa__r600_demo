@@ -110,7 +110,13 @@ void flush_gpu_dest_cache   (adapter_t *adapt, uint32_t type, uint64_t lower, ui
 				  SH_ACTION_ENA_bit | SMX_ACTION_ENA_bit)
 #define FLUSH_GPU_ALL_SOURCE_CACHE(adapt) flush_gpu_source_cache (adapt, FLUSH_GPU_INPUT_TYPE_ALL, 0, 0xffffffff00ULL)
 
-uint64_t upload (adapter_t *adapt, void *shader, int size, int offset);
+// Store shaders/buffers in GPU or GART (system) memory
+// In the GPU case buffers are stored after front buffer
+#define upload upload_gart
+
+uint64_t upload_gart (adapter_t *adapt, void *input, int size, int offset);
+uint64_t upload_gpu  (adapter_t *adapt, void *input, int size, int offset);
+
 void dump_shader (adapter_t *adapt, uint32_t *shader, int size, char *what);
 
 /* FIXME: naming: this waits on the CPU, while the others let the CP wait only */
