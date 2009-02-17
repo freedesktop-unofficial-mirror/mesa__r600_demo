@@ -269,7 +269,8 @@ void test_tex_quad_perf(adapter_t *adapt, int testtype)
     /* Upload */
     vs_addr = upload (adapt, vs, sizeof(vs), 0);
     ps_addr = upload (adapt, ps, sizeof(ps), 4096);
-    vb_addr = upload (adapt, vb, MAX_NUM_QUADS * 4 * 4 * sizeof(float), 8192);
+    // The vb is 2MB, a DRM buffer is only 64k... Always use GPU memory
+    vb_addr = upload_gpu (adapt, vb, MAX_NUM_QUADS * 4 * 4 * sizeof(float), 8192);
     free (vb);
 
 
@@ -685,7 +686,8 @@ void test_alu_quad_perf(adapter_t *adapt, int testtype)
     /* Upload */
     vs_addr = upload (adapt, vs, sizeof(vs), 0);
     ps_addr = upload (adapt, ps, 4*ps_size, 4096);
-    vb_addr = upload (adapt, vb, MAX_NUM_QUADS * 4 * sizeof(*vb), 8192);
+    // The vb is 2MB, a DRM buffer is only 64k... Always use GPU memory
+    vb_addr = upload_gpu (adapt, vb, MAX_NUM_QUADS * 4 * sizeof(*vb), 8192);
     free (vb);
 
     if (verbose) {
