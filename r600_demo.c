@@ -508,6 +508,7 @@ void usage (char *argv[]) {
 	    "\n"
 	    "r\t'r'eset GPU + CP\n"
 	    "-\tSleep for 100 millisecond\n"
+	    "/\tWait for engine idle\n"
 	    "c\tCPU based clear screen\n"
 	    "\n"
 	    "t\tedited tri test 2d (minimal)\n"
@@ -684,6 +685,9 @@ int main(int argc, char *argv[])
 	    break;
 	case '-':
 	    usleep (100000);
+	    break;
+	case '/':
+	    time_flush_cmds (&adapter, 5.0);
 	    break;
 	case 'c':
 	    simple_clear (&adapter);
