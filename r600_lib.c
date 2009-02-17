@@ -34,6 +34,7 @@
 #include <unistd.h>
 #include <math.h>
 #include <assert.h>
+#include <errno.h>
 #include <sys/time.h>
 
 #include "r600_reg.h"
@@ -47,6 +48,7 @@
 extern int       drmFD;
 extern int       indirect_start, indirect_end, indirect_size, indirect_idx, ring_size;
 extern drm_context_t context;
+extern drmBufMapPtr BufMapPtr;
 extern void     *ring;
 
 extern int verbose;
@@ -135,15 +137,22 @@ void wait_3d_full_idle_clean ()
 }
 
 
-void flush_indirect (void)
+static void flush_indirect (void)
 {
     drm_radeon_indirect_t  ind;
-    int r;
+    int r, discard = 0;
+    drmDMAReq  dma;
+
+    // If buffer is more than half filled, fetch a new one
+    if (indirect_end > indirect_size / 2) {
+	fprintf (stderr, "  Buffer more than half filled, fetching new one after committing.\n");
+	discard = 1;
+    }
 
     ind.idx     = indirect_idx;
     ind.start   = indirect_start;
     ind.end     = indirect_end;
-    ind.discard = 0;
+    ind.discard = discard;
 
     drmGetLock(drmFD,context,DRM_LOCK_READY);
     r=drmCommandWriteRead(drmFD, DRM_RADEON_INDIRECT,
@@ -154,11 +163,38 @@ void flush_indirect (void)
     	drmError(r, __func__);
     }
 
-    indirect_start=indirect_end;
+    if (discard) {
+	// Fetch a new one. Yes, this should be a separate function.
+	dma.context         = context;
+	dma.send_count      = 0;
+	dma.request_count   = 1;
+	dma.request_size    = 64000;
+	dma.request_list    = &indirect_idx;
+	dma.request_sizes   = &indirect_size;
+	dma.flags           = DRM_DMA_WAIT;
+	do {
+	    drmGetLock(drmFD, context, DRM_LOCK_READY);
+	    r = drmDMA (drmFD, &dma);
+	    drmUnlock(drmFD,context);
+	} while (r == EBUSY);
+	if (r && r != EBUSY) {
+	    drmError(r, __func__);
+	    exit(-1);
+	}
+	indirect = BufMapPtr->list[indirect_idx].address;
+	indirect_start = indirect_end = BufMapPtr->list[indirect_idx].used;
+	if (verbose >= 1)
+	    fprintf (stderr, "  New indirect buffer: #%d, size %d, @0x%p\n",
+		     indirect_idx, indirect_size, indirect);
+
+	indirect_start=indirect_end = 0;
+
+    } else
+	indirect_start=indirect_end;
 }
 
 
-void flush_ib_to_ring (void)
+static void flush_ib_to_ring (void)
 {
     int i;
     int rstart = reg_read32 (CP_RB_WPTR);
