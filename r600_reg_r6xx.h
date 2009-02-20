@@ -84,6 +84,8 @@ enum {
 
     D1GRPH_PRIMARY_SURFACE_ADDRESS                        = 0x6110,
     D1GRPH_PITCH                                          = 0x6120,
+    D1GRPH_X_START                                        = 0x612c,
+    D1GRPH_X_END                                          = 0x6134,
     D1GRPH_Y_END                                          = 0x6138,
 
     GRBM_STATUS                                           = 0x8010,

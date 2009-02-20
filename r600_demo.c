@@ -66,7 +66,7 @@ volatile void *registers=NULL;
 void *framebuffer=NULL;
 int framebuffer_size=0;
 
-int display_width, display_height;
+int display_width, display_pitch, display_height;
 uint32_t display_gpu;		// Should be 64bit, but is currently 32bit address in R6xx, R7xx chips
 
 /* DMA buffers */
@@ -471,11 +471,13 @@ void read_registers(void)
 	fprintf (stderr, "Chipset: untested, #%d\n\n", adapter.chipset);
     }
 
-    display_width  = reg_read32 (D1GRPH_PITCH);
+    display_width  = reg_read32 (D1GRPH_X_END) - reg_read32 (D1GRPH_X_START);
+    display_pitch  = reg_read32 (D1GRPH_PITCH);
     display_height = reg_read32 (D1GRPH_Y_END);
     display_gpu    = reg_read32 (D1GRPH_PRIMARY_SURFACE_ADDRESS);
     if (verbose >= 2) {
 	fprintf(stderr,"display_width=%d\n", display_width);
+	fprintf(stderr,"display_pitch=%d\n", display_pitch);
 	fprintf(stderr,"display gpu: 0x%08x\n", display_gpu);
     }
 
@@ -616,16 +618,16 @@ int main(int argc, char *argv[])
 		framebuffer, adapter.framebuffer_gpu);
     adapter.display_gpu    = display_gpu;
     adapter.display        = framebuffer + display_gpu - adapter.framebuffer_gpu;
-    adapter.display_pitch  = display_width;
+    adapter.display_pitch  = display_pitch;
     adapter.display_width  = display_width;
     adapter.display_height = display_height;
     
     adapter.color_gpu      = display_gpu;
-    adapter.color_pitch    = display_width;
+    adapter.color_pitch    = display_pitch;
     adapter.color_height   = display_height;
 
-    adapter.depth_gpu      = display_gpu + display_width*4*500;
-    adapter.depth_pitch    = display_width;
+    adapter.depth_gpu      = display_gpu + display_pitch*4*500;
+    adapter.depth_pitch    = display_pitch;
     adapter.depth_height   = 480;
 
     if (verbose >= 1) {
