@@ -245,14 +245,18 @@ void flush_cmds (void)
 	return;
     }
     if (verbose) {
-	printf ("flushing indirect buffer %d with %d dwords%s:\n",
+	printf ("flushing indirect buffer %d with %d dwords%s",
 		indirect_idx, (indirect_end-indirect_start)>>2,
 		use_ring_directly ? " to ring":"");
-	for (i = indirect_start>>2; i < indirect_end>>2; i += 8) {
-	    printf ("  %08x %08x %08x %08x %08x %08x %08x %08x\n",
-		    indirect[i],   indirect[i+1], indirect[i+2], indirect[i+3],
-		    indirect[i+4], indirect[i+5], indirect[i+6], indirect[i+7]);
-	}
+	if (verbose >= 2) {
+	    printf (":\n");
+	    for (i = indirect_start>>2; i < indirect_end>>2; i += 8) {
+		printf ("  %08x %08x %08x %08x %08x %08x %08x %08x\n",
+			indirect[i],   indirect[i+1], indirect[i+2], indirect[i+3],
+			indirect[i+4], indirect[i+5], indirect[i+6], indirect[i+7]);
+	    }
+	} else
+	    printf ("\n");
     }
 
     if (do_not_flush)
