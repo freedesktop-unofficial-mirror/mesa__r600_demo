@@ -82,12 +82,15 @@ enum {
 
     VENDOR_DEVICE_ID                                      = 0x4000,
 
+    D1CRTC_STATUS_POSITION                                = 0x60a0,
     D1GRPH_PRIMARY_SURFACE_ADDRESS                        = 0x6110,
     D1GRPH_PITCH                                          = 0x6120,
     D1GRPH_X_START                                        = 0x612c,
     D1GRPH_X_END                                          = 0x6134,
     D1GRPH_Y_END                                          = 0x6138,
-
+    D1MODE_VLINE_START_END                                = 0x6538,
+    D1MODE_VLINE_STATUS                                   = 0x653c,
+    
     GRBM_STATUS                                           = 0x8010,
 	CMDFIFO_AVAIL_mask                                = 0x1f << 0,
 	CMDFIFO_AVAIL_shift                               = 0,

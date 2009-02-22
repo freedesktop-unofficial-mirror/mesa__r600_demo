@@ -127,6 +127,7 @@ float time_flush_cmds (adapter_t *adapt, float maxtime);
 void wait_3d_idle_clean(void);
 void wait_3d_idle(void);
 void wait_3d_full_idle_clean (void);
+void emit_wait_for_vsync (adapter_t *adapt, int line);
 
 void simple_clear (adapter_t* adapt);
 

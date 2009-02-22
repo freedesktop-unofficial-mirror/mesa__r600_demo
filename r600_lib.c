@@ -137,6 +137,20 @@ void wait_3d_full_idle_clean ()
 }
 
 
+void emit_wait_for_vsync (adapter_t *adapt, int line)
+{
+    CMD_BUFFER_PREAMBLE (2 + 7);
+    
+    PACK3 (IT_WAIT_REG_MEM, 6);
+    E32   (0x00000003);						/* ME, Register, EqualTo */
+    E32   (D1CRTC_STATUS_POSITION >> 2);
+    E32   (0);
+    E32   (line);						/* Ref value */
+    E32   (0xfff);						/* Ref mask */
+    E32   (10);							/* Wait interval */
+}
+
+
 static void flush_indirect (void)
 {
     drm_radeon_indirect_t  ind;
