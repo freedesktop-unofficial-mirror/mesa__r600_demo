@@ -145,7 +145,8 @@ static void flush_indirect (void)
 
     // If buffer is more than half filled, fetch a new one
     if (indirect_end > indirect_size / 2) {
-	fprintf (stderr, "  Buffer more than half filled, fetching new one after committing.\n");
+	if (verbose >= 1)
+	    fprintf (stderr, "  Buffer more than half filled, fetching new one after committing.\n");
 	discard = 1;
     }
 
@@ -183,7 +184,7 @@ static void flush_indirect (void)
 	}
 	indirect = BufMapPtr->list[indirect_idx].address;
 	indirect_start = indirect_end = BufMapPtr->list[indirect_idx].used;
-	if (verbose >= 1)
+	if (verbose >= 2)
 	    fprintf (stderr, "  New indirect buffer: #%d, size %d, @0x%p\n",
 		     indirect_idx, indirect_size, indirect);
 
