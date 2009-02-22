@@ -344,7 +344,7 @@ uint64_t upload_gart (adapter_t *adapt, void *input, int size, int offset)
 
 uint64_t upload_gpu (adapter_t *adapt, void *input, int size, int offset)
 {
-    int off = (adapt->color_pitch * adapt->color_height * 4) + offset;
+    int off = adapt->free_gpu - adapt->framebuffer_gpu + offset;
     return do_upload (adapt, adapt->framebuffer_gpu + off, (char *)adapt->framebuffer + off,
 		      input, size, offset);
 }
