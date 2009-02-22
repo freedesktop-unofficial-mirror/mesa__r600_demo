@@ -89,9 +89,9 @@ typedef struct {
     uint64_t color_gpu;
     uint32_t color_pitch;
     uint32_t color_height;
-    uint64_t depth_gpu;
-    uint32_t depth_pitch;
-    uint32_t depth_height;
+    
+    void    *free_cpu;
+    uint64_t free_gpu;
 } adapter_t;
 
 /* TODO: Should go to _hwapi.h, probably moved to adapter_t / context_t */

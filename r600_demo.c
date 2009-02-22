@@ -626,9 +626,8 @@ int main(int argc, char *argv[])
     adapter.color_pitch    = display_pitch;
     adapter.color_height   = display_height;
 
-    adapter.depth_gpu      = display_gpu + display_pitch*4*500;
-    adapter.depth_pitch    = display_pitch;
-    adapter.depth_height   = 480;
+    adapter.free_gpu       = display_gpu + display_height*display_pitch*4;
+    adapter.free_cpu       = adapter.display + display_height*display_pitch*4;
 
     if (verbose >= 1) {
 	fprintf (stderr, "\nfb:       gpu 0x" PRINTF_UINT64_HEX ", cpu %p, size 0x" PRINTF_UINT64_HEX "\n",
@@ -637,8 +636,6 @@ int main(int argc, char *argv[])
 		 adapter.display_gpu, adapter.display, adapter.display_width, adapter.display_height, adapter.display_pitch);
 	fprintf (stderr, "color RT: gpu 0x" PRINTF_UINT64_HEX "  (%dx%d)\n",
 		 adapter.color_gpu, adapter.color_pitch, adapter.color_height);
-	fprintf (stderr, "depth:    gpu 0x" PRINTF_UINT64_HEX "  (%dx%d)\n",
-		 adapter.depth_gpu, adapter.depth_pitch, adapter.depth_height);
 	fprintf (stderr, "gart:     gpu 0x" PRINTF_UINT64_HEX ", cpu %p\n",
 		 gart_gpu, gart);
 	fprintf (stderr, "gart bufs:gpu 0x" PRINTF_UINT64_HEX ", cpu %p\n",
