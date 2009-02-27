@@ -1305,27 +1305,34 @@ static int do_cf_inst(uint32_t *inst, uint32_t offset, int is_r700)
 int main (int argc, char* argv[]) {
 	uint32_t sp[MAXINST];
 	FILE *fp;
-	int is_r700 = 1; //1
+	int is_r700 = 0;
 	uint32_t dword0 = sp[0];
 	uint32_t dword1 = sp[1];
 	uint32_t offset = 0;
-	int eop = 0, i = 0;
+	int eop = 0, i = 0, j = 0;
 
 	memset(sp, 0, MAXINST*sizeof(uint32_t));
 
-	if (argv[1]) {
-		fp = fopen(argv[1], "r");
-		if (fp == NULL) {
+	if (argc > 1) {
+	    for (i = 1; i < argc; i++) {
+		if (!strcmp("--r7xx", argv[i])) {
+		    is_r700 = 1;
+		    continue;
+		} else {
+		    fp = fopen(argv[i], "r");
+		    if (fp == NULL) {
 			printf("convert_shader: input file open error\n");
 			return -1;
-		} else {
-			for (i = 0; i < MAXINST; i++) {
-				fscanf(fp, "%x,", &sp[i]);
+		    } else {
+			for (j = 0; j < MAXINST; j++) {
+			    fscanf(fp, "%x,", &sp[j]);
 			}
+		    }
+		    fclose(fp);
 		}
-		fclose(fp);
+	    }
 	} else {
-		printf("convert_shader: no input shader file\n");
+		printf("convert_shader [--r7xx] shader_file\n");
 		return -1;
 	}
 
