@@ -5,6 +5,8 @@
 #include <string.h>
 #include <stdint.h>
 
+#define MAXINST 100
+
 const char *rel[2] = {
 	"ABSOLUTE",
 	"RELATIVE"
@@ -1300,62 +1302,32 @@ static int do_cf_inst(uint32_t *inst, uint32_t offset, int is_r700)
 	return eop;
 }
 
-int main () {
-	uint32_t sp[] = {
-		0x00000014,
-		0x00800400,
-		0x00000003,
-		0xA03C0000,
-		0xC0018000,
-		0x94200688,
-		0x10200001,
-		0x004C2810,
-		0x10A00401,
-		0x204C2800,
-		0x11200801,
-		0x404C2800,
-		0x91A00C01,
-		0x60442800,
-		0x10202001,
-		0x004C2800,
-		0x10A02401,
-		0x204C2810,
-		0x11202801,
-		0x404C2800,
-		0x91A02C01,
-		0x60442800,
-		0x10204001,
-		0x004C2800,
-		0x10A04401,
-		0x204C2800,
-		0x11204801,
-		0x404C2810,
-		0x91A04C01,
-		0x60442800,
-		0x10000002,
-		0x00740C90,
-		0x10000402,
-		0x20740C90,
-		0x10000802,
-		0x40740C90,
-		0x90000C02,
-		0x60600C90,
-		0x00000000,
-		0x00000000,
-		0x00000010,
-		0xF00FF001,
-		0x68800000,
-		0xDEADDEAD,
-		0x00000110,
-		0xF01D1E01,
-		0x68808000,
-		0xDEADDEAD,
-	};
+int main (int argc, char* argv[]) {
+	uint32_t sp[MAXINST];
+	FILE *fp;
 	int is_r700 = 1; //1
 	uint32_t dword0 = sp[0];
 	uint32_t dword1 = sp[1];
 	uint32_t offset = 0;
-	int eop = 0;
+	int eop = 0, i = 0;
+
+	memset(sp, 0, MAXINST*sizeof(uint32_t));
+
+	if (argv[1]) {
+		fp = fopen(argv[1], "r");
+		if (fp == NULL) {
+			printf("convert_shader: input file open error\n");
+			return -1;
+		} else {
+			for (i = 0; i < MAXINST; i++) {
+				fscanf(fp, "%x,", &sp[i]);
+			}
+		}
+		fclose(fp);
+	} else {
+		printf("convert_shader: no input shader file\n");
+		return -1;
+	}
 
 	while (offset < (sizeof(sp) / 8)) {
 		eop = do_cf_inst(sp, offset, is_r700);
