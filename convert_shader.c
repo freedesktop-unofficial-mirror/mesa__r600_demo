@@ -5,7 +5,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#define MAXINST 100
+#define MAXINST 1000
 
 const char *rel[2] = {
 	"ABSOLUTE",
