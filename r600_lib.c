@@ -83,6 +83,10 @@ float wait_reg_time (adapter_t *adapt, uint32_t reg, uint32_t v, const char *whe
 		break;
 	gettimeofday (&end, NULL);
 	diff = end.tv_sec - start.tv_sec + ((float)end.tv_usec - start.tv_usec) / 1e6;
+	if (diff < 0 || diff > 60) {
+	    gettimeofday (&start, NULL); /* system time wrap */
+	    diff = 0;
+	}
     } while (i == 1e6 && diff < maxtime);
 
     if (i == 1e6) {
